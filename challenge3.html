@@ -1,10 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Challenge 3: Loop Logic</title>
+  <title>Challenge 2: String Manipulation</title>
+  
   <!-- Include Skulpt libraries from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/skulpt@latest/dist/skulpt.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/skulpt@latest/dist/skulpt-stdlib.js"></script>
+
+  <!-- Include CodeMirror libraries -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script>
+
   <style>
     /* Dark mode & modern purple theme */
     body {
@@ -22,7 +29,7 @@
       font-size: 18px;
       color: #B0BEC5;
     }
-    textarea {
+    .CodeMirror {
       width: 80%;
       max-width: 600px;
       height: 150px;
@@ -31,8 +38,6 @@
       color: #E0E0E0;
       border: 1px solid #333;
       border-radius: 4px;
-      padding: 10px;
-      font-family: 'Roboto', sans-serif;
       font-size: 16px;
     }
     button {
@@ -64,24 +69,34 @@
   </style>
 </head>
 <body>
-  <h1>Challenge 3: Loop Logic</h1>
-  <p>Calculate the sum of all even numbers from 1 to 10 using Python.</p>
+  <h1>Challenge 2: String Manipulation</h1>
+  <p>Reverse this string using Python: <br><code>'!nuf hcum os si nohtyp'</code></p>
+
   <textarea id="code"></textarea><br>
   <button onclick="runcode()">Run</button>
-  <!-- Initially hidden back button -->
   <button id="back-button" style="display:none;" onclick="window.location.href='challenges.html'">Back</button>
   <pre id="output"></pre>
 
   <script>
-    // Append text output to the pre element
+    // Initialize CodeMirror with Python syntax highlighting and tab support
+    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+      mode: "python",
+      theme: "monokai",  // Change theme if you want
+      lineNumbers: true,
+      indentUnit: 4, // Spaces per tab
+      tabSize: 4,
+      extraKeys: { "Tab": function(cm) { cm.replaceSelection("    ", "end"); } } // Enables tab indentation
+    });
+
+    // Append output to the designated <pre> element
     function outf(text) {
       var mypre = document.getElementById("output");
       mypre.innerHTML += text;
     }
 
-    // Execute user code using Skulpt
+    // Execute the code using Skulpt
     function runcode() {
-      var prog = document.getElementById("code").value;
+      var prog = editor.getValue(); // Get the code from CodeMirror editor
       var outputElem = document.getElementById("output");
       outputElem.innerHTML = "";  // Clear previous output
 
@@ -90,19 +105,17 @@
         read: builtinRead
       });
 
+      // Run the code asynchronously
       Sk.misceval.asyncToPromise(function() {
           return Sk.importMainWithBody("<stdin>", false, prog, true);
       }).then(function(mod) {
           var result = outputElem.innerHTML.trim();
-          // If the output is exactly "30", the challenge is solved.
-          if (result === "30") {
-              outputElem.innerHTML = "Correct! FLAG{30}";
-              // Update localStorage progress (challenge 3 solved)
+          if (result === "python is so much fun!") {
+              outputElem.innerHTML = "Correct! FLAG{python is so much fun!}";
               var progress = parseInt(localStorage.getItem("ctf_progress") || "0");
-              if (progress < 3) {
-                  localStorage.setItem("ctf_progress", "3");
+              if (progress < 2) {
+                  localStorage.setItem("ctf_progress", "2");
               }
-              // Reveal the back button for navigation
               document.getElementById("back-button").style.display = "inline-block";
           } else {
               outputElem.innerHTML += "\nIncorrect. Try again.";
