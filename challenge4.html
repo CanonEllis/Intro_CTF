@@ -2,11 +2,12 @@
 <html>
 <head>
   <title>Challenge 4: Fibonacci Sequence</title>
-  <!-- Include Skulpt libraries from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/skulpt@latest/dist/skulpt.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/skulpt@latest/dist/skulpt-stdlib.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script>
   <style>
-    /* Dark mode & modern purple theme */
     body {
       background-color: #121212;
       color: #E0E0E0;
@@ -22,7 +23,7 @@
       font-size: 18px;
       color: #B0BEC5;
     }
-    textarea {
+    .CodeMirror {
       width: 80%;
       max-width: 600px;
       height: 200px;
@@ -31,8 +32,6 @@
       color: #E0E0E0;
       border: 1px solid #333;
       border-radius: 4px;
-      padding: 10px;
-      font-family: 'Roboto', sans-serif;
       font-size: 16px;
     }
     button {
@@ -66,45 +65,46 @@
 <body>
   <h1>Challenge 4: Fibonacci Sequence</h1>
   <p>Write a Python function that computes the 10th Fibonacci number and prints it.</p>
-  <textarea id="code">
-  </textarea><br>
+  <textarea id="code"></textarea>
+  <br>
   <button onclick="runcode()">Run</button>
-  <!-- Initially hidden back button -->
   <button id="back-button" style="display:none;" onclick="window.location.href='challenges.html'">Back</button>
   <pre id="output"></pre>
 
   <script>
-    // Function to append output to the <pre> element
+    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+      mode: "python",
+      theme: "dracula",
+      lineNumbers: true,
+      indentUnit: 4,
+      tabSize: 4
+    });
+
     function outf(text) {
       var mypre = document.getElementById("output");
       mypre.innerHTML += text;
     }
 
-    // Execute the user's code using Skulpt
     function runcode() {
-      var prog = document.getElementById("code").value;
+      var prog = editor.getValue();
       var outputElem = document.getElementById("output");
-      outputElem.innerHTML = "";  // Clear previous output
+      outputElem.innerHTML = "";
 
       Sk.configure({
         output: outf,
         read: builtinRead
       });
 
-      // Run the code asynchronously
       Sk.misceval.asyncToPromise(function() {
           return Sk.importMainWithBody("<stdin>", false, prog, true);
       }).then(function(mod) {
-          // Get trimmed output from the <pre> element
           var result = outputElem.innerHTML.trim();
           if (result === "55") {
               outputElem.innerHTML = "Correct! FLAG{55}";
-              // Update localStorage progress (challenge 4 solved)
               var progress = parseInt(localStorage.getItem("ctf_progress") || "0");
               if (progress < 4) {
                   localStorage.setItem("ctf_progress", "4");
               }
-              // Reveal the back button for navigation
               document.getElementById("back-button").style.display = "inline-block";
           } else {
               outputElem.innerHTML += "\nIncorrect. Try again.";
@@ -114,7 +114,6 @@
       });
     }
 
-    // Helper function for Skulpt to read built-in files
     function builtinRead(x) {
       if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
           throw "File not found: '" + x + "'";
