@@ -1,10 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Challenge 7: Caesar Cipher Decryption</title>
+
   <!-- Include Skulpt libraries from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/skulpt@latest/dist/skulpt.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/skulpt@latest/dist/skulpt-stdlib.js"></script>
+
+  <!-- Include CodeMirror libraries from CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+
   <style>
     /* Dark mode & modern purple theme */
     body {
@@ -13,28 +22,48 @@
       font-family: 'Roboto', sans-serif;
       padding: 40px;
       text-align: center;
+      display: flex;
+      justify-content: flex-start; /* Align to top */
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      flex-direction: column;
     }
     h1 { color: #BB86FC; margin-bottom: 20px; }
     p { font-size: 18px; color: #B0BEC5; }
-    textarea {
-      width: 80%; max-width: 600px; height: 200px;
-      margin-top: 20px; background-color: #1E1E1E;
-      color: #E0E0E0; border: 1px solid #333;
-      border-radius: 4px; padding: 10px;
-      font-family: 'Roboto', sans-serif; font-size: 16px;
+
+    .CodeMirror {
+      width: 80%;
+      max-width: 600px;
+      height: 200px;
+      margin-top: 20px;
+      background-color: #1E1E1E;
+      border: 1px solid #333;
+      border-radius: 4px;
     }
+
     button {
-      font-size: 18px; padding: 10px 25px;
-      margin-top: 20px; background-color: #BB86FC;
-      border: none; border-radius: 4px; color: #121212;
-      cursor: pointer; transition: background-color 0.3s;
+      font-size: 18px;
+      padding: 10px 25px;
+      margin-top: 20px;
+      background-color: #BB86FC;
+      border: none;
+      border-radius: 4px;
+      color: #121212;
+      cursor: pointer;
+      transition: background-color 0.3s;
     }
     button:hover { background-color: #9E67E8; }
     pre {
-      text-align: left; background-color: #1E1E1E;
-      padding: 15px; margin: 20px auto; width: 80%;
-      max-width: 600px; border-radius: 4px;
-      color: #E0E0E0; border: 1px solid #333;
+      text-align: left;
+      background-color: #1E1E1E;
+      padding: 15px;
+      margin: 20px auto;
+      width: 80%;
+      max-width: 600px;
+      border-radius: 4px;
+      color: #E0E0E0;
+      border: 1px solid #333;
       white-space: pre-wrap;
     }
   </style>
@@ -42,42 +71,64 @@
 <body>
   <h1>Challenge 7: Caesar Cipher Decryption</h1>
   <p>Decrypt the message <code>"khoor zruog"</code> using a Caesar cipher with a shift of 3.</p>
-  <textarea id="code">
-  </textarea><br>
+
+  <!-- CodeMirror editor for user input -->
+  <textarea id="code"></textarea><br>
+
   <button onclick="runcode()">Run</button>
   <!-- Initially hidden back button -->
   <button id="back-button" style="display:none;" onclick="window.location.href='challenges.html'">Back</button>
   <pre id="output"></pre>
 
   <script>
+    // Initialize CodeMirror editor
+    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+      mode: "python",
+      lineNumbers: true,
+      theme: "darcula"
+    });
+
     function outf(text) {
       var mypre = document.getElementById("output");
       mypre.innerHTML += text;
     }
+
     function runcode() {
-      var prog = document.getElementById("code").value;
+      var prog = editor.getValue(); // Get the code from the editor
       var outputElem = document.getElementById("output");
-      outputElem.innerHTML = "";
-      Sk.configure({ output: outf, read: builtinRead });
+      outputElem.innerHTML = "";  // Clear previous output
+
+      Sk.configure({
+        output: outf,
+        read: builtinRead
+      });
+
       Sk.misceval.asyncToPromise(function() {
-          return Sk.importMainWithBody("<stdin>", false, prog, true);
+        return Sk.importMainWithBody("<stdin>", false, prog, true);
       }).then(function(mod) {
-          var result = outputElem.innerHTML.trim();
-          if (result === "hello world") {
-              outputElem.innerHTML = "Correct! FLAG{hello world}";
-              var progress = parseInt(localStorage.getItem("ctf_progress") || "0");
-              if (progress < 7) { localStorage.setItem("ctf_progress", "7"); }
-              document.getElementById("back-button").style.display = "inline-block";
-          } else {
-              outputElem.innerHTML += "\nIncorrect. Try again.";
+        var result = outputElem.innerHTML.trim();
+        // Check if the output matches the expected output
+        if (result === "hello world") {
+          outputElem.innerHTML = "Correct! FLAG{hello world}";
+          // Update localStorage progress (challenge 7 solved)
+          var progress = parseInt(localStorage.getItem("ctf_progress") || "0");
+          if (progress < 7) {
+            localStorage.setItem("ctf_progress", "7");
           }
+          // Reveal the back button so students can navigate back to the challenge list
+          document.getElementById("back-button").style.display = "inline-block";
+        } else {
+          outputElem.innerHTML += "\nIncorrect. Try again.";
+        }
       }, function(err) {
-          outputElem.innerHTML = err.toString();
+        outputElem.innerHTML = err.toString();
       });
     }
+
+    // Helper function for Skulpt to read built-in files
     function builtinRead(x) {
       if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
-          throw "File not found: '" + x + "'";
+        throw "File not found: '" + x + "'";
       return Sk.builtinFiles["files"][x];
     }
   </script>
