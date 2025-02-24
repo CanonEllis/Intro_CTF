@@ -55,6 +55,7 @@
       background-color: #1E1E1E;
       margin: 30px auto;
       overflow: hidden;
+      display: none;
     }
     #loading-bar {
       height: 100%;
@@ -89,15 +90,16 @@
     document.addEventListener("DOMContentLoaded", function() {
       // Function to start the loading animation and redirect when complete
       function startLoading() {
+        console.log("Starting loading animation...");
         // Hide the new user inputs and show the returning user area.
         document.getElementById("new-user").style.display = "none";
         document.getElementById("returning-user").style.display = "block";
-        // Ensure the loading bar container is visible.
+        // Ensure the loading container is visible.
         document.getElementById("loading-container").style.display = "block";
-
+        
         var name = localStorage.getItem("ctf_name");
         document.getElementById("welcome-back").textContent = "Welcome Back, " + name + "!";
-
+        
         var progress = 0;
         var loadingBar = document.getElementById("loading-bar");
         var interval = setInterval(function() {
@@ -106,12 +108,13 @@
           loadingBar.style.width = progress + "%";
           if (progress >= 100) {
             clearInterval(interval);
+            console.log("Loading complete. Redirecting to challenges.html");
             window.location.href = "challenges.html";
           }
         }, 200);
       }
-
-      // Function to handle user entering their name
+      
+      // Function to handle when user enters their name
       document.getElementById("enter-button").addEventListener("click", function() {
         var name = document.getElementById("name").value.trim();
         if (!name) {
@@ -121,8 +124,8 @@
           startLoading();
         }
       });
-
-      // If a user exists in localStorage, start loading immediately
+      
+      // If a user already exists, start loading immediately
       if (localStorage.getItem("ctf_name")) {
         startLoading();
       }
