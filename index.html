@@ -2,7 +2,6 @@
 <html>
 <head>
   <title>Python CTF Challenge 24/25</title>
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.11.0/brython.min.js"></script>
   <style>
     /* Dark mode & modern purple theme */
     body {
@@ -46,36 +45,88 @@
     button:hover {
       background-color: #9E67E8;
     }
+    /* Loading bar styles */
+    #loading-container {
+      width: 80%;
+      max-width: 400px;
+      height: 25px;
+      border: 1px solid #333;
+      border-radius: 5px;
+      background-color: #1E1E1E;
+      margin: 30px auto;
+      overflow: hidden;
+    }
+    #loading-bar {
+      height: 100%;
+      width: 0%;
+      background-color: #BB86FC;
+      border-radius: 5px;
+      transition: width 0.3s ease;
+    }
   </style>
 </head>
-<body onload="brython()">
-
+<body>
   <h1>Welcome to the Python CTF Challenge!</h1>
   <p>Use your Python skills to solve each challenge and reveal the flags!</p>
 
-  <!-- New name input field -->
-  <input type="text" id="name" placeholder="Enter your name">
-  <br>
-  <button id="enter-button">ENTER</button>
+  <!-- New user input area -->
+  <div id="new-user">
+    <input type="text" id="name" placeholder="Enter your name">
+    <br>
+    <button id="enter-button">ENTER</button>
+  </div>
 
-  <script type="text/python">
-from browser import document, window, alert
+  <!-- Returning user area with welcome message and loading bar -->
+  <div id="returning-user" style="display: none;">
+    <h2 id="welcome-back"></h2>
+    <div id="loading-container">
+      <div id="loading-bar"></div>
+    </div>
+    <p>Loading challenges...</p>
+  </div>
 
-def initialize():
-    # Initialize progress if not already set
-    if not window.localStorage.getItem("ctf_progress"):
-        window.localStorage.setItem("ctf_progress", "0")
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Function to start the loading animation and redirect when complete
+      function startLoading() {
+        // Hide the new user inputs and show the returning user area.
+        document.getElementById("new-user").style.display = "none";
+        document.getElementById("returning-user").style.display = "block";
+        // Ensure the loading bar container is visible.
+        document.getElementById("loading-container").style.display = "block";
 
-def enter_ctf(ev):
-    name = document["name"].value.strip()
-    if not name:
-        alert("Please enter your name!")
-    else:
-        window.localStorage.setItem("ctf_name", name)
-        window.location.href = 'challenges.html'
+        var name = localStorage.getItem("ctf_name");
+        document.getElementById("welcome-back").textContent = "Welcome Back, " + name + "!";
 
-initialize()
-document["enter-button"].bind("click", enter_ctf)
+        var progress = 0;
+        var loadingBar = document.getElementById("loading-bar");
+        var interval = setInterval(function() {
+          progress += 5;  // Increase progress by 5% every 200ms
+          if (progress > 100) progress = 100;
+          loadingBar.style.width = progress + "%";
+          if (progress >= 100) {
+            clearInterval(interval);
+            window.location.href = "challenges.html";
+          }
+        }, 200);
+      }
+
+      // Function to handle user entering their name
+      document.getElementById("enter-button").addEventListener("click", function() {
+        var name = document.getElementById("name").value.trim();
+        if (!name) {
+          alert("Please enter your name!");
+        } else {
+          localStorage.setItem("ctf_name", name);
+          startLoading();
+        }
+      });
+
+      // If a user exists in localStorage, start loading immediately
+      if (localStorage.getItem("ctf_name")) {
+        startLoading();
+      }
+    });
   </script>
 </body>
 </html>
