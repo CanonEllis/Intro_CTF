@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Challenge 2: String Manipulation</title>
-  
+  <title>Challenge 3: Loop Logic</title>
   <!-- Include Skulpt libraries from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/skulpt@latest/dist/skulpt.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/skulpt@latest/dist/skulpt-stdlib.js"></script>
-
-  <!-- Include CodeMirror libraries -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script>
+  
+  <!-- Include CodeMirror -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/addon/edit/closebrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/addon/edit/matchbrackets.min.js"></script>
 
   <style>
     /* Dark mode & modern purple theme */
@@ -32,7 +33,7 @@
     .CodeMirror {
       width: 80%;
       max-width: 600px;
-      height: 150px;
+      height: 200px;
       margin-top: 20px;
       background-color: #1E1E1E;
       color: #E0E0E0;
@@ -69,34 +70,35 @@
   </style>
 </head>
 <body>
-  <h1>Challenge 2: String Manipulation</h1>
-  <p>Reverse this string using Python: <br><code>'!nuf hcum os si nohtyp'</code></p>
-
+  <h1>Challenge 3: Loop Logic</h1>
+  <p>Calculate the sum of all even numbers from 1 to 10 using Python.</p>
   <textarea id="code"></textarea><br>
   <button onclick="runcode()">Run</button>
+  <!-- Initially hidden back button -->
   <button id="back-button" style="display:none;" onclick="window.location.href='challenges.html'">Back</button>
   <pre id="output"></pre>
 
   <script>
-    // Initialize CodeMirror with Python syntax highlighting and tab support
+    // Initialize CodeMirror
     var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
       mode: "python",
-      theme: "monokai",  // Change theme if you want
+      theme: "dracula",
       lineNumbers: true,
-      indentUnit: 4, // Spaces per tab
-      tabSize: 4,
-      extraKeys: { "Tab": function(cm) { cm.replaceSelection("    ", "end"); } } // Enables tab indentation
+      autoCloseBrackets: true,
+      matchBrackets: true,
+      indentUnit: 4,
+      tabSize: 4
     });
 
-    // Append output to the designated <pre> element
+    // Append text output to the pre element
     function outf(text) {
       var mypre = document.getElementById("output");
       mypre.innerHTML += text;
     }
 
-    // Execute the code using Skulpt
+    // Execute user code using Skulpt
     function runcode() {
-      var prog = editor.getValue(); // Get the code from CodeMirror editor
+      var prog = editor.getValue();
       var outputElem = document.getElementById("output");
       outputElem.innerHTML = "";  // Clear previous output
 
@@ -105,16 +107,15 @@
         read: builtinRead
       });
 
-      // Run the code asynchronously
       Sk.misceval.asyncToPromise(function() {
           return Sk.importMainWithBody("<stdin>", false, prog, true);
       }).then(function(mod) {
           var result = outputElem.innerHTML.trim();
-          if (result === "python is so much fun!") {
-              outputElem.innerHTML = "Correct! FLAG{python is so much fun!}";
+          if (result === "30") {
+              outputElem.innerHTML = "Correct! FLAG{30}";
               var progress = parseInt(localStorage.getItem("ctf_progress") || "0");
-              if (progress < 2) {
-                  localStorage.setItem("ctf_progress", "2");
+              if (progress < 3) {
+                  localStorage.setItem("ctf_progress", "3");
               }
               document.getElementById("back-button").style.display = "inline-block";
           } else {
