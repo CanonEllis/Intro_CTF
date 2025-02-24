@@ -1,69 +1,144 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Challenge 9: Atbash Cipher Decryption</title>
   <!-- Include Skulpt libraries from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/skulpt@latest/dist/skulpt.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/skulpt@latest/dist/skulpt-stdlib.js"></script>
+  <!-- Include CodeMirror libraries from CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script>
   <style>
-    /* Dark mode & modern purple theme */
-    body { background-color: #121212; color: #E0E0E0;
-      font-family: 'Roboto', sans-serif; padding: 40px; text-align: center; }
-    h1 { color: #BB86FC; margin-bottom: 20px; }
-    p { font-size: 18px; color: #B0BEC5; }
-    textarea { width: 80%; max-width: 600px; height: 200px;
-      margin-top: 20px; background-color: #1E1E1E; color: #E0E0E0;
-      border: 1px solid #333; border-radius: 4px; padding: 10px;
-      font-family: 'Roboto', sans-serif; font-size: 16px; }
-    button { font-size: 18px; padding: 10px 25px; margin-top: 20px;
-      background-color: #BB86FC; border: none; border-radius: 4px;
-      color: #121212; cursor: pointer; transition: background-color 0.3s; }
-    button:hover { background-color: #9E67E8; }
-    pre { text-align: left; background-color: #1E1E1E;
-      padding: 15px; margin: 20px auto; width: 80%; max-width: 600px;
-      border-radius: 4px; color: #E0E0E0; border: 1px solid #333;
-      white-space: pre-wrap; }
+    body {
+      background-color: #121212;
+      color: #E0E0E0;
+      font-family: 'Roboto', sans-serif;
+      padding: 40px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      color: #BB86FC;
+      margin-bottom: 20px;
+    }
+    p {
+      font-size: 18px;
+      color: #B0BEC5;
+    }
+    .CodeMirror {
+      width: 80%;
+      max-width: 600px;
+      height: 200px;
+      margin-top: 20px;
+      background-color: #1E1E1E;
+      border: 1px solid #333;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    .CodeMirror, .CodeMirror-lines {
+      color: #E0E0E0 !important;
+    }
+    .CodeMirror-cursor {
+      border-left: 1px solid #E0E0E0 !important;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    button {
+      font-size: 18px;
+      padding: 10px 25px;
+      background-color: #BB86FC;
+      border: none;
+      border-radius: 4px;
+      color: #121212;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin: 0 10px;
+    }
+    button:hover {
+      background-color: #9E67E8;
+    }
+    pre {
+      text-align: left;
+      background-color: #1E1E1E;
+      padding: 15px;
+      margin: 20px auto;
+      width: 80%;
+      max-width: 600px;
+      border-radius: 4px;
+      color: #E0E0E0;
+      border: 1px solid #333;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
   <h1>Challenge 9: Atbash Cipher Decryption</h1>
   <p>Decrypt the Atbash cipher-encoded message <code>"yrmzib"</code> to reveal a core CS term.</p>
-  <textarea id="code">
-  </textarea><br>
-  <button onclick="runcode()">Run</button>
-  <!-- Initially hidden back button -->
-  <button id="back-button" style="display:none;" onclick="window.location.href='challenges.html'">Back</button>
+
+  <!-- CodeMirror editor for user input -->
+  <textarea id="code"></textarea>
+
+  <div class="button-container">
+    <button onclick="runcode()">Run</button>
+    <button id="back-button" style="display:none;" onclick="window.location.href='challenges.html'">Back</button>
+  </div>
+
   <pre id="output"></pre>
 
   <script>
+    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+      mode: "python",
+      theme: "dracula",
+      lineNumbers: true,
+      indentUnit: 4,
+      tabSize: 4
+    });
+
     function outf(text) {
       var mypre = document.getElementById("output");
       mypre.innerHTML += text;
     }
+
     function runcode() {
-      var prog = document.getElementById("code").value;
+      var prog = editor.getValue();
       var outputElem = document.getElementById("output");
       outputElem.innerHTML = "";
-      Sk.configure({ output: outf, read: builtinRead });
+
+      Sk.configure({
+        output: outf,
+        read: builtinRead
+      });
+
       Sk.misceval.asyncToPromise(function() {
-          return Sk.importMainWithBody("<stdin>", false, prog, true);
+        return Sk.importMainWithBody("<stdin>", false, prog, true);
       }).then(function(mod) {
-          var result = outputElem.innerHTML.trim();
-          if (result === "binary") {
-              outputElem.innerHTML = "Correct! FLAG{binary}";
-              var progress = parseInt(localStorage.getItem("ctf_progress") || "0");
-              if (progress < 9) { localStorage.setItem("ctf_progress", "9"); }
-              document.getElementById("back-button").style.display = "inline-block";
-          } else {
-              outputElem.innerHTML += "\nIncorrect. Try again.";
+        var result = outputElem.innerHTML.trim();
+        if (result === "binary") {
+          outputElem.innerHTML = "Correct! FLAG{binary}";
+          var progress = parseInt(localStorage.getItem("ctf_progress") || "0");
+          if (progress < 9) {
+            localStorage.setItem("ctf_progress", "9");
           }
+          document.getElementById("back-button").style.display = "inline-block";
+        } else {
+          outputElem.innerHTML += "\nIncorrect. Try again.";
+        }
       }, function(err) {
-          outputElem.innerHTML = err.toString();
+        outputElem.innerHTML = err.toString();
       });
     }
+
     function builtinRead(x) {
       if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
-          throw "File not found: '" + x + "'";
+        throw "File not found: '" + x + "'";
       return Sk.builtinFiles["files"][x];
     }
   </script>
