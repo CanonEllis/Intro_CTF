@@ -2,11 +2,12 @@
 <html>
 <head>
   <title>Challenge 2: String Manipulation</title>
-  <!-- Include Skulpt libraries from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/skulpt@latest/dist/skulpt.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/skulpt@latest/dist/skulpt-stdlib.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
   <style>
-    /* Dark mode & modern purple theme */
     body {
       background-color: #121212;
       color: #E0E0E0;
@@ -22,17 +23,15 @@
       font-size: 18px;
       color: #B0BEC5;
     }
-    textarea {
+    .CodeMirror {
       width: 80%;
       max-width: 600px;
       height: 150px;
-      margin-top: 20px;
+      margin: 20px auto;
       background-color: #1E1E1E;
       color: #E0E0E0;
       border: 1px solid #333;
       border-radius: 4px;
-      padding: 10px;
-      font-family: 'Roboto', sans-serif;
       font-size: 16px;
     }
     button {
@@ -66,45 +65,42 @@
 <body>
   <h1>Challenge 2: String Manipulation</h1>
   <p>Reverse this string using Python: <br><code>'!nuf hcum os si nohtyp'</code></p>
-  <textarea id="code"></textarea><br>
+  <textarea id="code"></textarea>
+  <br>
   <button onclick="runcode()">Run</button>
-  <!-- Initially hidden back button -->
   <button id="back-button" style="display:none;" onclick="window.location.href='challenges.html'">Back</button>
   <pre id="output"></pre>
 
   <script>
-    // Append output to the designated <pre> element
+    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+      mode: "python",
+      theme: "material-darker",
+      lineNumbers: true,
+      indentUnit: 4,
+      tabSize: 4
+    });
+
     function outf(text) {
       var mypre = document.getElementById("output");
       mypre.innerHTML += text;
     }
 
-    // Execute the code using Skulpt
     function runcode() {
-      var prog = document.getElementById("code").value;
+      var prog = editor.getValue();
       var outputElem = document.getElementById("output");
-      outputElem.innerHTML = "";  // Clear previous output
+      outputElem.innerHTML = "";
+      Sk.configure({ output: outf, read: builtinRead });
 
-      Sk.configure({
-        output: outf,
-        read: builtinRead
-      });
-
-      // Run the code asynchronously
       Sk.misceval.asyncToPromise(function() {
           return Sk.importMainWithBody("<stdin>", false, prog, true);
       }).then(function(mod) {
-          // Get the trimmed output from the <pre> element
           var result = outputElem.innerHTML.trim();
-          // Expected output is the reversed string: "python is working"
           if (result === "python is so much fun!") {
               outputElem.innerHTML = "Correct! FLAG{python is so much fun!}";
-              // Update localStorage to mark challenge 2 as completed
               var progress = parseInt(localStorage.getItem("ctf_progress") || "0");
               if (progress < 2) {
                   localStorage.setItem("ctf_progress", "2");
               }
-              // Reveal the back button so they can return to the challenges list
               document.getElementById("back-button").style.display = "inline-block";
           } else {
               outputElem.innerHTML += "\nIncorrect. Try again.";
@@ -114,7 +110,6 @@
       });
     }
 
-    // Helper function for Skulpt to read built-in files
     function builtinRead(x) {
       if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
           throw "File not found: '" + x + "'";
