@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Challenge 1: Basic Math</title>
+  <!-- Include Skulpt libraries from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/skulpt@latest/dist/skulpt.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/skulpt@latest/dist/skulpt-stdlib.js"></script>
+  <style>
+    /* Dark mode & modern purple theme */
+    body {
+      background-color: #121212;
+      color: #E0E0E0;
+      font-family: 'Roboto', sans-serif;
+      padding: 40px;
+      text-align: center;
+    }
+    h1 {
+      color: #BB86FC;
+      margin-bottom: 20px;
+    }
+    p {
+      font-size: 18px;
+      color: #B0BEC5;
+    }
+    textarea {
+      width: 80%;
+      max-width: 600px;
+      height: 150px;
+      margin-top: 20px;
+      background-color: #1E1E1E;
+      color: #E0E0E0;
+      border: 1px solid #333;
+      border-radius: 4px;
+      padding: 10px;
+      font-family: 'Roboto', sans-serif;
+      font-size: 16px;
+    }
+    button {
+      font-size: 18px;
+      padding: 10px 25px;
+      margin-top: 20px;
+      background-color: #BB86FC;
+      border: none;
+      border-radius: 4px;
+      color: #121212;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #9E67E8;
+    }
+    pre {
+      text-align: left;
+      background-color: #1E1E1E;
+      padding: 15px;
+      margin: 20px auto;
+      width: 80%;
+      max-width: 600px;
+      border-radius: 4px;
+      color: #E0E0E0;
+      border: 1px solid #333;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>Challenge 1: Basic Math</h1>
+  <p>Solve this math problem using Python: What is 3 * 7 + 4?</p>
+  <textarea id="code"></textarea><br>
+  <button onclick="runcode()">Run</button>
+  <!-- Initially hidden back button -->
+  <button id="back-button" style="display:none;" onclick="window.location.href='challenges.html'">Back</button>
+  <pre id="output"></pre>
+
+  <script>
+    // Function to append output text
+    function outf(text) {
+      var mypre = document.getElementById("output");
+      mypre.innerHTML += text;
+    }
+
+    // Function to execute the user's code using Skulpt
+    function runcode() {
+      var prog = document.getElementById("code").value;
+      var outputElem = document.getElementById("output");
+      outputElem.innerHTML = "";  // Clear previous output
+
+      Sk.configure({
+        output: outf,
+        read: builtinRead
+      });
+
+      // Run the code asynchronously
+      Sk.misceval.asyncToPromise(function() {
+          return Sk.importMainWithBody("<stdin>", false, prog, true);
+      }).then(function(mod) {
+          // Get the trimmed output from the pre element
+          var result = outputElem.innerHTML.trim();
+          if (result === "25") {
+              // If the answer is correct, display success and the flag
+              outputElem.innerHTML = "Correct! FLAG{25}";
+              // Unlock the next challenge by updating localStorage (challenge 1 solved)
+              var progress = parseInt(localStorage.getItem("ctf_progress") || "0");
+              if (progress < 1) {
+                  localStorage.setItem("ctf_progress", "1");
+              }
+              // Reveal the back button so they can return to the challenges list
+              document.getElementById("back-button").style.display = "inline-block";
+          } else {
+              outputElem.innerHTML += "\nIncorrect. Try again.";
+          }
+      }, function(err) {
+          outputElem.innerHTML = err.toString();
+      });
+    }
+
+    // Helper function for Skulpt to read built-in files
+    function builtinRead(x) {
+      if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+          throw "File not found: '" + x + "'";
+      return Sk.builtinFiles["files"][x];
+    }
+  </script>
+</body>
+</html>

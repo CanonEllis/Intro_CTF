@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Challenges</title>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.11.0/brython.min.js"></script>
+  <style>
+    /* Dark mode & modern purple theme */
+    body {
+      background-color: #121212;
+      color: #E0E0E0;
+      font-family: 'Roboto', sans-serif;
+      padding: 40px;
+      position: relative;
+    }
+    #user-info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 18px;
+      color: #BB86FC;
+    }
+    h1 {
+      text-align: center;
+      color: #BB86FC;
+      margin-bottom: 30px;
+    }
+    .challenge {
+      margin: 20px auto;
+      width: 80%;
+      padding: 15px;
+      border: 1px solid #333;
+      border-radius: 8px;
+      background-color: #1E1E1E;
+      text-align: center;
+      position: relative;
+    }
+    .challenge a {
+      text-decoration: none;
+      color: #BB86FC;
+      font-size: 20px;
+    }
+    .challenge a:hover {
+      color: #9E67E8;
+    }
+    .locked {
+      color: #757575;
+    }
+    .checkmark {
+      color: #00FF00;
+      font-size: 24px;
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body onload="brython()">
+  <div id="user-info"></div>
+  <h1>Challenges</h1>
+
+  <!-- Challenge entries for challenges 1 to 10 -->
+  <div class="challenge">
+    <a href="challenge1.html" id="challenge1">Challenge 1: Basic Math</a>
+    <span id="check1" class="checkmark">✅</span>
+  </div>
+  <div class="challenge">
+    <a href="#" id="challenge2" class="locked">Challenge 2: String Manipulation (Locked)</a>
+    <span id="check2" class="checkmark">✅</span>
+  </div>
+  <div class="challenge">
+    <a href="#" id="challenge3" class="locked">Challenge 3: Loop Logic (Locked)</a>
+    <span id="check3" class="checkmark">✅</span>
+  </div>
+  <div class="challenge">
+    <a href="#" id="challenge4" class="locked">Challenge 4: Fibonacci Sequence (Locked)</a>
+    <span id="check4" class="checkmark">✅</span>
+  </div>
+  <div class="challenge">
+    <a href="#" id="challenge5" class="locked">Challenge 5: Factorial Calculation (Locked)</a>
+    <span id="check5" class="checkmark">✅</span>
+  </div>
+  <div class="challenge">
+    <a href="#" id="challenge6" class="locked">Challenge 6: List Comprehension – Even Squares (Locked)</a>
+    <span id="check6" class="checkmark">✅</span>
+  </div>
+  <div class="challenge">
+    <a href="#" id="challenge7" class="locked">Challenge 7: Caesar Cipher Decryption (Locked)</a>
+    <span id="check7" class="checkmark">✅</span>
+  </div>
+  <div class="challenge">
+    <a href="#" id="challenge8" class="locked">Challenge 8: ROT13 Decryption – Alan Turing Edition (Locked)</a>
+    <span id="check8" class="checkmark">✅</span>
+  </div>
+  <div class="challenge">
+    <a href="#" id="challenge9" class="locked">Challenge 9: Atbash Cipher Decryption (Locked)</a>
+    <span id="check9" class="checkmark">✅</span>
+  </div>
+  <div class="challenge">
+    <a href="#" id="challenge10" class="locked">Challenge 10: Morse Code Decoder (Locked)</a>
+    <span id="check10" class="checkmark">✅</span>
+  </div>
+
+  <script type="text/python">
+from browser import document, window
+
+def update_challenges():
+    # Retrieve progress from localStorage (default to "0")
+    progress = int(window.localStorage.getItem("ctf_progress") or "0")
+
+    # Retrieve and display the user's name if available
+    name = window.localStorage.getItem("ctf_name")
+    if name:
+        document["user-info"].textContent = "Welcome, " + name
+
+    # Unlock challenges based on progress value.
+    if progress >= 1:
+        document['challenge2'].attrs['href'] = 'challenge2.html'
+        document['challenge2'].classList.remove('locked')
+    if progress >= 2:
+        document['challenge3'].attrs['href'] = 'challenge3.html'
+        document['challenge3'].classList.remove('locked')
+    if progress >= 3:
+        document['challenge4'].attrs['href'] = 'challenge4.html'
+        document['challenge4'].classList.remove('locked')
+    if progress >= 4:
+        document['challenge5'].attrs['href'] = 'challenge5.html'
+        document['challenge5'].classList.remove('locked')
+    if progress >= 5:
+        document['challenge6'].attrs['href'] = 'challenge6.html'
+        document['challenge6'].classList.remove('locked')
+    if progress >= 6:
+        document['challenge7'].attrs['href'] = 'challenge7.html'
+        document['challenge7'].classList.remove('locked')
+    if progress >= 7:
+        document['challenge8'].attrs['href'] = 'challenge8.html'
+        document['challenge8'].classList.remove('locked')
+    if progress >= 8:
+        document['challenge9'].attrs['href'] = 'challenge9.html'
+        document['challenge9'].classList.remove('locked')
+    if progress >= 9:
+        document['challenge10'].attrs['href'] = 'challenge10.html'
+        document['challenge10'].classList.remove('locked')
+
+    # Show green checkmarks for each completed challenge
+    for i in range(1, 11):
+        if progress >= i:
+            document[f'check{i}'].style.display = "inline-block"
+
+update_challenges()
+  </script>
+</body>
+</html>

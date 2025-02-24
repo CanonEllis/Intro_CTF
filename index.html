@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Python CTF Challenge 24/25</title>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.11.0/brython.min.js"></script>
+  <style>
+    /* Dark mode & modern purple theme */
+    body {
+      background-color: #121212;
+      color: #E0E0E0;
+      font-family: 'Roboto', sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 50px;
+    }
+    h1 {
+      color: #BB86FC;
+      margin-bottom: 20px;
+    }
+    p {
+      color: #B0BEC5;
+      font-size: 18px;
+    }
+    input {
+      padding: 10px;
+      font-size: 18px;
+      border-radius: 5px;
+      border: 1px solid #333;
+      margin-top: 20px;
+      background-color: #1E1E1E;
+      color: #E0E0E0;
+      width: 80%;
+      max-width: 400px;
+    }
+    button {
+      font-size: 20px;
+      padding: 12px 30px;
+      margin-top: 30px;
+      background-color: #BB86FC;
+      border: none;
+      border-radius: 5px;
+      color: #121212;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #9E67E8;
+    }
+  </style>
+</head>
+<body onload="brython()">
+
+  <h1>Welcome to the Python CTF Challenge!</h1>
+  <p>Use your Python skills to solve each challenge and reveal the flags!</p>
+
+  <!-- New name input field -->
+  <input type="text" id="name" placeholder="Enter your name">
+  <br>
+  <button id="enter-button">ENTER</button>
+
+  <script type="text/python">
+from browser import document, window, alert
+
+def initialize():
+    # Initialize progress if not already set
+    if not window.localStorage.getItem("ctf_progress"):
+        window.localStorage.setItem("ctf_progress", "0")
+
+def enter_ctf(ev):
+    name = document["name"].value.strip()
+    if not name:
+        alert("Please enter your name!")
+    else:
+        window.localStorage.setItem("ctf_name", name)
+        window.location.href = 'challenges.html'
+
+initialize()
+document["enter-button"].bind("click", enter_ctf)
+  </script>
+</body>
+</html>
