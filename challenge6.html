@@ -5,6 +5,9 @@
   <!-- Include Skulpt libraries from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/skulpt@latest/dist/skulpt.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/skulpt@latest/dist/skulpt-stdlib.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script>
   <style>
     /* Dark mode & modern purple theme */
     body {
@@ -22,7 +25,7 @@
       font-size: 18px;
       color: #B0BEC5;
     }
-    textarea {
+    .CodeMirror {
       width: 80%;
       max-width: 600px;
       height: 150px;
@@ -31,9 +34,8 @@
       color: #E0E0E0;
       border: 1px solid #333;
       border-radius: 4px;
-      padding: 10px;
-      font-family: 'Roboto', sans-serif;
       font-size: 16px;
+      margin: 0 auto;
     }
     button {
       font-size: 18px;
@@ -68,14 +70,25 @@
   <p>
     From the list <code>[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</code>, use a list comprehension to output the squares of the even numbers.
   </p>
-  <textarea id="code">
-  </textarea><br>
+
+  <!-- Create the CodeMirror editor -->
+  <textarea id="code"></textarea><br>
+
+  <!-- Run button and back button below the editor -->
   <button onclick="runcode()">Run</button>
-  <!-- Initially hidden back button -->
   <button id="back-button" style="display:none;" onclick="window.location.href='challenges.html'">Back</button>
+
   <pre id="output"></pre>
 
   <script>
+    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+      mode: "python",
+      theme: "dracula",
+      lineNumbers: true,
+      indentUnit: 4,
+      tabSize: 4
+    });
+
     // Function to append text to the output <pre> element
     function outf(text) {
       var mypre = document.getElementById("output");
@@ -84,7 +97,7 @@
 
     // Execute the user's code using Skulpt
     function runcode() {
-      var prog = document.getElementById("code").value;
+      var prog = editor.getValue();
       var outputElem = document.getElementById("output");
       outputElem.innerHTML = "";  // Clear previous output
 
