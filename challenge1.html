@@ -5,6 +5,12 @@
   <!-- Include Skulpt libraries from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/skulpt@latest/dist/skulpt.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/skulpt@latest/dist/skulpt-stdlib.js"></script>
+
+  <!-- Include CodeMirror for Python Syntax Highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+  
   <style>
     /* Dark mode & modern purple theme */
     body {
@@ -22,18 +28,13 @@
       font-size: 18px;
       color: #B0BEC5;
     }
-    textarea {
+    .CodeMirror {
       width: 80%;
       max-width: 600px;
       height: 150px;
-      margin-top: 20px;
-      background-color: #1E1E1E;
-      color: #E0E0E0;
-      border: 1px solid #333;
-      border-radius: 4px;
-      padding: 10px;
-      font-family: 'Roboto', sans-serif;
+      margin: 20px auto;
       font-size: 16px;
+      border-radius: 4px;
     }
     button {
       font-size: 18px;
@@ -66,13 +67,25 @@
 <body>
   <h1>Challenge 1: Basic Math</h1>
   <p>Solve this math problem using Python: What is 3 * 7 + 4?</p>
-  <textarea id="code"></textarea><br>
+  
+  <!-- CodeMirror editor container -->
+  <div id="editor"></div>
+  
   <button onclick="runcode()">Run</button>
-  <!-- Initially hidden back button -->
   <button id="back-button" style="display:none;" onclick="window.location.href='challenges.html'">Back</button>
   <pre id="output"></pre>
 
   <script>
+    // Initialize CodeMirror
+    var editor = CodeMirror(document.getElementById("editor"), {
+      mode: "python",
+      lineNumbers: true,
+      theme: "dracula",  // Dark mode theme
+      indentUnit: 4,     // Spaces per tab
+      tabSize: 4,
+      indentWithTabs: false
+    });
+
     // Function to append output text
     function outf(text) {
       var mypre = document.getElementById("output");
@@ -81,7 +94,7 @@
 
     // Function to execute the user's code using Skulpt
     function runcode() {
-      var prog = document.getElementById("code").value;
+      var prog = editor.getValue(); // Get the code from CodeMirror editor
       var outputElem = document.getElementById("output");
       outputElem.innerHTML = "";  // Clear previous output
 
@@ -94,17 +107,10 @@
       Sk.misceval.asyncToPromise(function() {
           return Sk.importMainWithBody("<stdin>", false, prog, true);
       }).then(function(mod) {
-          // Get the trimmed output from the pre element
           var result = outputElem.innerHTML.trim();
           if (result === "25") {
-              // If the answer is correct, display success and the flag
               outputElem.innerHTML = "Correct! FLAG{25}";
-              // Unlock the next challenge by updating localStorage (challenge 1 solved)
-              var progress = parseInt(localStorage.getItem("ctf_progress") || "0");
-              if (progress < 1) {
-                  localStorage.setItem("ctf_progress", "1");
-              }
-              // Reveal the back button so they can return to the challenges list
+              localStorage.setItem("ctf_progress", "1");
               document.getElementById("back-button").style.display = "inline-block";
           } else {
               outputElem.innerHTML += "\nIncorrect. Try again.";
